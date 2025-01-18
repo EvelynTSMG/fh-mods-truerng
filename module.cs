@@ -1,8 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
-using Fahrenheit.CoreLib;
+using Fahrenheit.Core;
 
 namespace Fahrenheit.Modules.TrueRNG;
 
@@ -20,9 +19,8 @@ public sealed record TrueRNGModuleConfig : FhModuleConfig {
                                bool   configEnabled) : base(configName, configEnabled) {
     }
 
-    public override bool TrySpawnModule([NotNullWhen(true)] out FhModule? fm) {
-        fm = new TrueRNGModule(this);
-        return fm.ModuleState == FhModuleState.InitSuccess;
+    public override FhModule SpawnModule() {
+        return new TrueRNGModule(this);
     }
 }
 
@@ -65,7 +63,6 @@ public class TrueRNGModule : FhModule {
     public TrueRNGModule(TrueRNGModuleConfig moduleConfig) : base(moduleConfig) {
         _module_config = moduleConfig;
         _brnd_handle   = new FhMethodHandle<brnd>(this, "FFX.exe", new brnd(h_brnd), offset: 0x398900);
-        _moduleState   = FhModuleState.InitSuccess;
     }
 
     public uint h_brnd(int param_1) {
@@ -79,7 +76,7 @@ public class TrueRNGModule : FhModule {
         return _brnd_handle.orig_fptr.Invoke(0);
     }
 
-    public override bool FhModuleInit() {
+    public override bool init() {
         /* [fkelava 9/9/24 22:26]
          * Hook the target function of a method handle as follows:
          * > bool hook_successful = _handle.hook();
@@ -89,9 +86,5 @@ public class TrueRNGModule : FhModule {
          */
 
         return _brnd_handle.hook();
-    }
-
-    public override bool FhModuleOnError() {
-        return true;
     }
 }
