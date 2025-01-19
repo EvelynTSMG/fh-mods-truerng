@@ -15,9 +15,8 @@ namespace Fahrenheit.Modules.TrueRNG;
 
 public sealed record TrueRNGModuleConfig : FhModuleConfig {
     [JsonConstructor]
-    public TrueRNGModuleConfig(string configName,
-                               bool   configEnabled) : base(configName, configEnabled) {
-    }
+    public TrueRNGModuleConfig(string configName, bool configEnabled)
+        : base(configName, configEnabled) { }
 
     public override FhModule SpawnModule() {
         return new TrueRNGModule(this);
@@ -63,6 +62,7 @@ public class TrueRNGModule : FhModule {
     public TrueRNGModule(TrueRNGModuleConfig moduleConfig) : base(moduleConfig) {
         _module_config = moduleConfig;
         _brnd_handle   = new FhMethodHandle<brnd>(this, "FFX.exe", new brnd(h_brnd), offset: 0x398900);
+        _moduleState   = FhModuleState.InitSuccess;
     }
 
     public uint h_brnd(int param_1) {
