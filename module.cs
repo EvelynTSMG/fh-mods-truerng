@@ -62,7 +62,6 @@ public class TrueRNGModule : FhModule {
     public TrueRNGModule(TrueRNGModuleConfig moduleConfig) : base(moduleConfig) {
         _module_config = moduleConfig;
         _brnd_handle   = new FhMethodHandle<brnd>(this, "FFX.exe", new brnd(h_brnd), offset: 0x398900);
-        _moduleState   = FhModuleState.InitSuccess;
     }
 
     public uint h_brnd(int param_1) {
